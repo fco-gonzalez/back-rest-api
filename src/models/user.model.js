@@ -1,10 +1,8 @@
-const mongoose = require("mongoose");
+import mongoose, { mongo } from "mongoose";
 
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
       trim: true,
@@ -12,8 +10,8 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
+      unique: true,
     },
     password: {
       type: String,
