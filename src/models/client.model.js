@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const clientSchema = new mongoose.Schema(
   {
@@ -37,7 +37,7 @@ const clientSchema = new mongoose.Schema(
       required: false,
       trim: true,
     },
-    user_id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

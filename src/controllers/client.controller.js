@@ -1,9 +1,17 @@
-const Client = require("../models/client.model");
+import { request } from "express";
+import Client from "../models/client.model.js";
 
 // Get all clients filtered by client for user
 export const getClients = async (req, res) => {
   try {
-    const clients = await Client.find({ user: req.user._id }).populate("user");
+    const clients = await Client.find({ user: req.user.id }).populate(
+      "user",
+      "-password -createdAt -updatedAt"
+    );
+
+    if (!clients || clients.length === 0)
+      return res.status(404).json({ message: "Clients not found" });
+
     res.status(200).json({
       message: "All clients",
       clients: clients,
@@ -17,12 +25,17 @@ export const getClients = async (req, res) => {
 // Get a client by ID
 export const getClientById = async (req, res) => {
   try {
-    const client = await Client.findById(req.params.id);
+    // const client = await Client.findById(req.params.id);
+    const client = await Client.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
     if (!client) return res.status(404).json({ message: "Client not found" });
 
     res.status(200).json({
       message: "Client found",
       client: client,
+      user: req.user,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -32,14 +45,23 @@ export const getClientById = async (req, res) => {
 // Create a new client
 export const createClient = async (req, res) => {
   try {
+    const { nombre, descripcion, direccion, web, industria, estado, telefono } =
+      req.body;
+
     const newClient = new Client({
-      ...req.body,
-      user: req.user._id,
+      nombre,
+      descripcion,
+      direccion,
+      web,
+      industria,
+      estado,
+      telefono,
+      user: req.user.id,
     });
-    await newClient.save();
+    const savedClient = await newClient.save();
     res.status(201).json({
       message: "Client created successfully",
-      client: newClient,
+      client: savedClient,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
